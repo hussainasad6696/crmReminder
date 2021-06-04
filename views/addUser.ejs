@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html style="font-size: 16px;">
+<head>
+    <link rel="stylesheet" href="addUser.css" media="screen">
+</head>
+<body>
+    <h1> Add User </h1>
+    <form method="post" action="/addUser">
+        <div class="formBody" style="width:800px; margin:0 auto;">
+            <div class="input">
+                <label for="userName">User Name:</label>
+                <input type="text" id="userName" name="userName" required>
+            </div>
+            <div class="input">
+                <label for="password">Password:</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+            <div class="input">
+                <label for="maxLogins"> Maximum Logins:</label>
+                <input type="number" id="maxLogins" name="maxLogins" required>
+            </div>
+            <div class="input">
+                <button type="submit" >Create</button>
+            </div>
+        </div>
+    </form>
+</body>
+</html>

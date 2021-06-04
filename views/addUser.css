@@ -1,0 +1,12 @@
+.input{
+    margin: 30px 50px 10px 30px;
+    text-align: center;
+}
+
+.formBody{
+    border-style: solid;
+    border:1px solid black;
+    width:800px;
+    height: 300px;
+    margin:0 auto;
+}
