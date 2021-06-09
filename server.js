@@ -54,6 +54,56 @@ app.use("/static/", express.static(__dirname+"/static"));
 app.set('view engine',"ejs");
 app.listen(PORT, ()=>{
     console.log(`Server running at port ${PORT}`);
+    Alarm.find({}).then((alarms, err)=>{
+        if(err) {console.log(err)}
+        alarms.forEach(alarm=>{
+            result = help(alarm.time, alarm.date);
+            min = result[0];
+            hrs = result[1];
+            date = result[2];
+            month = result[3];
+            Login.findOne({userName: alarm.deviceUserName}).then((login)=>{
+                const job = schedule.scheduleJob(`${min || '00'} ${hrs || '00'} ${date || '00'} ${month || '00'} *`, ()=>{
+                    var registrationToken = login.deviceTokens;
+                    query = Alarm.findById(alarm._id);          // check if alarm exists in database
+                        if(query)
+                        {
+                            registrationToken.forEach(element=> {
+                                element = element.slice(1);
+                                element = element.slice(0, -1);
+                                console.log(element);
+                                var message = {
+                                    notification: {
+                                        title: alarm.alarmName,
+                                        body: 'Comment: '+alarm.comment 
+                                    },
+                                    token: element
+                                };
+                                console.log("passed message json setter ........................................"+message);
+                                admin.messaging().send(message)
+                                .then(()=>{
+                                    console.log('Notification sent: ');
+                                    console.log(alarm);
+                                    Histry.create(alarm).then((req, res)=>{
+                                        console.log('Added to history.');
+                                    });
+                                    Alarm.findByIdAndDelete({_id: alarm._id}, req.body).then((his)=>{
+                                        console.log("Alarm deleted from current database."+his)
+                                    })
+                                })
+                                .catch((err)=>{
+                                    console.log('Error in sending notification:----------------- ', err);
+                                });
+                            });
+                        }
+                        else
+                        {
+                            console.log('Deleted alarm did not send notification.');
+                        }
+                });
+            })
+            })
+        })
 });
 
 app.get('/alarms', (req, res)=>{
