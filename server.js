@@ -206,8 +206,17 @@ app.post('/alarms', (req, res)=>{
 
 app.post('/updateAlarm', (req, res)=>{
     console.log(req.body);
-    Alarm.findByIdAndUpdate({_id: req.body._id}, req.body).then((alarm)=>{
+    console.log(req.query._id);
+    Alarm.findByIdAndUpdate({_id: req.query._id}, req.body).then((alarm)=>{
         console.log('Alarm updated: '+ alarm);
+    })
+})
+
+app.post('/updatePassword', (req, res)=>{
+    console.log(req.body);
+    Login.findOneAndUpdate({userName: req.body.userName}, {password: req.body.password}).then((login)=>{
+        console.log('Password updated.');
+        res.sendStatus(200);
     })
 })
 
@@ -218,6 +227,31 @@ app.post('/delete/current', (req, res)=>{
         res.status(200).send('Alarm deleted'+alarm);
     });
     console.log('Deleted alarm from database.');
+});
+
+app.post('/deleteUser', (req, res)=>{
+    console.log(req.body);
+    Login.findOne({userName: req.body.userName}).then((client)=>{
+        if(client.accountType === 'admin')
+        {
+            Login.updateMany({supervisorAdmin: req.body.userName}, {supervisorAdmin: 'galaxy-developers'}).then(()=>{
+                Alarm.deleteMany({deviceUserName: req.body.userName});
+                Login.findOneAndDelete({userName: req.body.userName}).then(()=>{
+                    console.log('Admin deleted.');
+                    res.sendStatus(200);
+                })
+            })
+        }
+        else{
+            Login.findOneAndUpdate({userName: client.supervisorAdmin}, {$pull:{clientList: client._id}}).then(()=>{
+                Alarm.deleteMany({deviceUserName: req.body.userName});
+                Login.findOneAndDelete({userName: req.body.userName}).then(()=>{
+                    console.log('Client deleted.');
+                    res.sendStatus(200);
+                })
+            })
+        }
+    })
 });
 
 app.post('/delete/history', (req, res)=>{
@@ -245,7 +279,7 @@ app.post('/authentication', (req, res)=>{
         if (login){
             if (login.password === req.body.password){
                 console.log('Authentication successful.');
-                res.sendStatus(200);
+                res.status(200).send(login);
                 console.log(login.id+ " login id");
                 Login.findByIdAndUpdate({_id: mongoose.Types.ObjectId(login.id)}, {$inc: {numLogins: 1}})
                 .then(()=>{
@@ -303,6 +337,11 @@ app.post('/addUser', (req,res)=>{
                             console.log(err);
                         }
                      })
+                     Login.findOneAndUpdate({userName: req.body.supervisorAdmin}, {$addToSet: {clientList: login._id}},
+                        (err, res)=>{
+                            if(err) {console.log(err);}
+                            console.log('Client added to admin list of clients.');
+                        });
                     // if(login.accountType==='client')
                     // {
                     //     Login.findOneAndUpdate({userName: login.userName}, 
@@ -368,94 +407,110 @@ function help(t, d){
 }
 
 app.get('/alarm/urgent', (req, res) => {
-    Login.findOne({userName:req.query.deviceUserName}).then((user, err)=>{
+    // Login.findOne({userName:req.query.deviceUserName}).then((user, err)=>{
+    //     if(err) {console.log(err)};
+    //     console.log(user.accountType);
+    //     if(user.accountType === 'client')
+    //     {
+    //         Alarm.find({backGroundColor: 'Urgent', deviceUserName: req.query.deviceUserName}).then((alarms, err)=>{
+    //             if(err) {console.log(err)};
+    //             console.log(alarms);
+    //             res.send(alarms);
+    //           })
+    //     }
+    //     else if (user.accountType === 'admin')
+    //     {
+    //         console.log("admin --------------------------------");
+    //         Alarm.find({backGroundColor: 'Urgent', supervisorAdmin: req.query.deviceUserName}).then((alarms, err)=>{
+    //             if(err) {console.log(err)};
+    //             console.log("====== yourgent"+alarms+" =============");
+    //             res.send(alarms);
+    //           })
+    //     }
+    //     // if (user.accountType === 'su-admin')
+    //     else 
+    //     {
+    //         console.log("su-admin --------------------------------");
+    //         Alarm.find({backGroundColor: 'Urgent'}).then((alarms, err)=>{
+    //             if(err) {console.log(err)};
+    //             res.send(alarms);
+    //           })
+    //     }
+    //   })
+
+      Alarm.find({backGroundColor: "Urgent", deviceUserName: req.query.deviceUserName}).then((alarms, err)=>{
         if(err) {console.log(err)};
-        console.log(user.accountType);
-        if(user.accountType === 'client')
-        {
-            Alarm.find({backGroundColor: 'Urgent', deviceUserName: req.query.deviceUserName}).then((alarms, err)=>{
-                if(err) {console.log(err)};
-                console.log(alarms);
-                res.send(alarms);
-              })
-        }
-        else if (user.accountType === 'admin')
-        {
-            console.log("admin --------------------------------");
-            Alarm.find({backGroundColor: 'Urgent', supervisorAdmin: req.query.deviceUserName}).then((alarms, err)=>{
-                if(err) {console.log(err)};
-                console.log("====== yourgent"+alarms+" =============");
-                res.send(alarms);
-              })
-        }
-        // if (user.accountType === 'su-admin')
-        else 
-        {
-            console.log("su-admin --------------------------------");
-            Alarm.find({backGroundColor: 'Urgent'}).then((alarms, err)=>{
-                if(err) {console.log(err)};
-                res.send(alarms);
-              })
-        }
-      })
+        res.send(alarms);
+      });
 });
 
 app.get('/alarm/normal', (req, res) => {
-    Login.findOne({userName:req.query.deviceUserName}).then((user, err)=>{
-        if(err) {console.log(err)};
-        if(user.accountType === 'client')
-        {
-            Alarm.find({backGroundColor: "Normal", deviceUserName: req.query.deviceUserName}).then((alarms, err)=>{
-                if(err) {console.log(err)};
-                res.send(alarms);
-              })
-        }
-        else if (user.accountType === 'admin')
-        {
-            Alarm.find({backGroundColor: "Normal", supervisorAdmin: req.query.deviceUserName}).then((alarms, err)=>{
-                if(err) {console.log(err)};
-                console.log(alarms);
-                res.send(alarms);
-              })
-        }
-        else 
-        {
-            Alarm.find({backGroundColor: "Normal"}).then((alarms, err)=>{
-                if(err) {console.log(err)};
-                res.send(alarms);
-              })
-        }
-      })
+    // Login.findOne({userName:req.query.deviceUserName}).then((user, err)=>{
+    //     if(err) {console.log(err)};
+    //     if(user.accountType === 'client')
+    //     {
+    //         Alarm.find({backGroundColor: "Normal", deviceUserName: req.query.deviceUserName}).then((alarms, err)=>{
+    //             if(err) {console.log(err)};
+    //             res.send(alarms);
+    //           })
+    //     }
+    //     else if (user.accountType === 'admin')
+    //     {
+    //         Alarm.find({backGroundColor: "Normal", supervisorAdmin: req.query.deviceUserName}).then((alarms, err)=>{
+    //             if(err) {console.log(err)};
+    //             console.log(alarms);
+    //             res.send(alarms);
+    //           })
+    //     }
+    //     else 
+    //     {
+    //         Alarm.find({backGroundColor: "Normal"}).then((alarms, err)=>{
+    //             if(err) {console.log(err)};
+    //             res.send(alarms);
+    //           })
+    //     }
+    //   })
+
+    
+                Alarm.find({backGroundColor: "Normal", deviceUserName: req.query.deviceUserName}).then((alarms, err)=>{
+                    if(err) {console.log(err)};
+                    res.send(alarms);
+                  });
 });
 
 app.get('/alarm/pending', (req, res) => {
-    Login.findOne({userName:req.query.deviceUserName}).then((user, err)=>{
+    // Login.findOne({userName:req.query.deviceUserName}).then((user, err)=>{
+    //     if(err) {console.log(err)};
+    //     if(user.accountType === 'client')
+    //     {
+    //         Alarm.find({backGroundColor: "Pending", deviceUserName: req.query.deviceUserName}).then((alarms, err)=>{
+    //             if(err) {console.log(err)};
+    //             console.log("====client== yopending"+alarms+" =============");
+    //             res.send(alarms);
+    //           })
+    //     }
+    //     else if (user.accountType === 'admin')
+    //     {
+    //         console.log("===="+req.query.deviceUserName);
+    //         Alarm.find({backGroundColor: "Pending", supervisorAdmin: req.query.deviceUserName}).then((alarms, err)=>{
+    //             if(err) {console.log(err)};
+    //             console.log("===admin=== yopending"+alarms+" =============");
+    //             res.send(alarms);
+    //           })
+    //     }
+    //     else
+    //     {
+    //         Alarm.find({backGroundColor: "Pending"}).then((alarms, err)=>{
+    //             if(err) {console.log(err)};
+    //             res.send(alarms);
+    //           })
+    //     }
+    //   })
+
+      Alarm.find({backGroundColor: "Pending", deviceUserName: req.query.deviceUserName}).then((alarms, err)=>{
         if(err) {console.log(err)};
-        if(user.accountType === 'client')
-        {
-            Alarm.find({backGroundColor: "Pending", deviceUserName: req.query.deviceUserName}).then((alarms, err)=>{
-                if(err) {console.log(err)};
-                console.log("====client== yopending"+alarms+" =============");
-                res.send(alarms);
-              })
-        }
-        else if (user.accountType === 'admin')
-        {
-            console.log("===="+req.query.deviceUserName);
-            Alarm.find({backGroundColor: "Pending", supervisorAdmin: req.query.deviceUserName}).then((alarms, err)=>{
-                if(err) {console.log(err)};
-                console.log("===admin=== yopending"+alarms+" =============");
-                res.send(alarms);
-              })
-        }
-        else
-        {
-            Alarm.find({backGroundColor: "Pending"}).then((alarms, err)=>{
-                if(err) {console.log(err)};
-                res.send(alarms);
-              })
-        }
-      })
+        res.send(alarms);
+      });
 });
 
 app.get('/admin', (req, res)=>{
@@ -472,3 +527,15 @@ app.get('/adminPassword', (req, res)=>{
         res.send(result.password);
     });
 });
+
+app.get('/clientList', (req, res)=>{
+    Login.findOne({userName: req.query.deviceUserName}).then((login)=>{
+        var clients = new Map();
+        login.clientList.forEach(client=>{
+            Login.findById(client).then((res)=>{
+                clients.set(client, res.userName);
+            })
+        })
+    })
+    res.send(clients);
+})
