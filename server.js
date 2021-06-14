@@ -6,6 +6,7 @@ const fs = require('fs');
 const Alarm = require('./models/info');
 const Login = require('./models/login');
 const Histry = require('./models/history')
+const ClientsList = require('./models/clientsListObj')
 const fetch = require('node-fetch');
 const schedule = require('node-schedule');
 const path = require('path');
@@ -529,13 +530,7 @@ app.get('/adminPassword', (req, res)=>{
 });
 
 app.get('/clientList', (req, res)=>{
-    Login.findOne({userName: req.query.deviceUserName}).then((login)=>{
-        var clients = new Map();
-        login.clientList.forEach(client=>{
-            Login.findById(client).then((res)=>{
-                clients.set(client, res.userName);
-            })
-        })
+    Login.find({supervisorAdmin: req.query.deviceUserName}, '_id userName').then((clients)=>{
+        res.send(clients);
     })
-    res.send(clients);
-})
+});
