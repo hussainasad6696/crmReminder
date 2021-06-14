@@ -115,6 +115,7 @@ app.get('/alarms', (req, res)=>{
     //   })
       Alarm.find({deviceUserName: req.query.deviceUserName}).then((alarms, err)=>{
         if(err) {console.log(err)};
+        console.log(req.query.searchKeyWord);
         if(req.query.searchKeyWord === "")
         {
             res.send(alarms);
