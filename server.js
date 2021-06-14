@@ -108,18 +108,63 @@ app.listen(PORT, ()=>{
 });
 
 app.get('/alarms', (req, res)=>{
-    Alarm.find({deviceUserName:req.query.deviceUserName}).then((alarms, err)=>{
+    // Alarm.find({deviceUserName:req.query.deviceUserName}).then((alarms, err)=>{
+    //     if(err) {console.log(err)};
+    //     console.log(alarms+" live ----------------");
+    //     res.send(alarms);
+    //   })
+      Alarm.find({deviceUserName: req.query.deviceUserName}).then((alarms, err)=>{
         if(err) {console.log(err)};
-        res.send(alarms);
-      })
+        if(req.query.searchKeyWord === "")
+        {
+            res.send(alarms);
+        }
+        else{
+            var result = [];
+            alarms.forEach(alarm => {
+                if (alarm.alarmName.includes(req.query.searchKeyWord))
+                {
+                    result.push(alarm);
+                }
+            })
+            if(result.length>0){
+            res.send(result);
+            }
+            else{
+                res.status(404).send('No alarm matches the keyword.');
+            }
+        }
+      });
 });
 
 app.get('/history', (req, res)=>{
-    Histry.find({deviceUserName:req.query.deviceUserName}).then((alarms, err)=>{
+    // Histry.find({deviceUserName:req.query.deviceUserName}).then((alarms, err)=>{
+    //     if(err) {console.log(err)};
+    //     console.log(alarms+" history ----------------");
+    //     res.send(alarms);
+    //   })
+      Histry.find({deviceUserName: req.query.deviceUserName}).then((alarms, err)=>{
         if(err) {console.log(err)};
-        console.log(alarms+" history ----------------");
-        res.send(alarms);
-      })
+        if(req.query.searchKeyWord === "")
+        {
+            res.send(alarms);
+        }
+        else{
+            var result = [];
+            alarms.forEach(alarm => {
+                if (alarm.alarmName.includes(req.query.searchKeyWord))
+                {
+                    result.push(alarm);
+                }
+            })
+            if(result.length>0){
+            res.send(result);
+            }
+            else{
+                res.status(404).send('No alarm matches the keyword.');
+            }
+        }
+      });
 });
 
 
@@ -207,9 +252,13 @@ app.post('/alarms', (req, res)=>{
 
 app.post('/updateAlarm', (req, res)=>{
     console.log(req.body);
-    console.log(req.query._id);
-    Alarm.findByIdAndUpdate({_id: req.query._id}, req.body).then((alarm)=>{
-        console.log('Alarm updated: '+ alarm);
+    console.log(req.query.id);
+    console.log(req.query.deviceUserName);
+    Alarm.findByIdAndUpdate({_id: req.query.id}, req.body).then((alarm)=>{
+        Alarm.findByIdAndUpdate({_id: alarm._id}, {deviceUserName: req.query.deviceUserName}).then((res)=>{
+            
+        console.log('Alarm updated: '+ res);
+        })
     })
 })
 
@@ -438,11 +487,28 @@ app.get('/alarm/urgent', (req, res) => {
     //           })
     //     }
     //   })
-
-      Alarm.find({backGroundColor: "Urgent", deviceUserName: req.query.deviceUserName}).then((alarms, err)=>{
-        if(err) {console.log(err)};
-        res.send(alarms);
-      });
+        Alarm.find({backGroundColor: "Urgent", deviceUserName: req.query.deviceUserName}).then((alarms, err)=>{
+            if(err) {console.log(err)};
+            if(req.query.searchKeyWord === "")
+            {
+                res.send(alarms);
+            }
+            else{
+                var result = [];
+                alarms.forEach(alarm => {
+                    if (alarm.alarmName.includes(req.query.searchKeyWord))
+                    {
+                        result.push(alarm);
+                    }
+                })
+                if(result.length>0){
+                res.send(result);
+                }
+                else{
+                    res.status(404).send('No alarm matches the keyword.');
+                }
+            }
+          });
 });
 
 app.get('/alarm/normal', (req, res) => {
@@ -471,12 +537,28 @@ app.get('/alarm/normal', (req, res) => {
     //           })
     //     }
     //   })
-
-    
-                Alarm.find({backGroundColor: "Normal", deviceUserName: req.query.deviceUserName}).then((alarms, err)=>{
-                    if(err) {console.log(err)};
-                    res.send(alarms);
-                  });
+    Alarm.find({backGroundColor: "Normal", deviceUserName: req.query.deviceUserName}).then((alarms, err)=>{
+        if(err) {console.log(err)};
+        if(req.query.searchKeyWord === "")
+        {
+            res.send(alarms);
+        }
+        else{
+            var result = [];
+            alarms.forEach(alarm => {
+                if (alarm.alarmName.includes(req.query.searchKeyWord))
+                {
+                    result.push(alarm);
+                }
+            })
+            if(result.length>0){
+            res.send(result);
+            }
+            else{
+                res.status(404).send('No alarm matches the keyword.');
+            }
+        }
+      });
 });
 
 app.get('/alarm/pending', (req, res) => {
@@ -507,10 +589,27 @@ app.get('/alarm/pending', (req, res) => {
     //           })
     //     }
     //   })
-
-      Alarm.find({backGroundColor: "Pending", deviceUserName: req.query.deviceUserName}).then((alarms, err)=>{
+    Alarm.find({backGroundColor: "Pending", deviceUserName: req.query.deviceUserName}).then((alarms, err)=>{
         if(err) {console.log(err)};
-        res.send(alarms);
+        if(req.query.searchKeyWord === "")
+        {
+            res.send(alarms);
+        }
+        else{
+            var result = [];
+            alarms.forEach(alarm => {
+                if (alarm.alarmName.includes(req.query.searchKeyWord))
+                {
+                    result.push(alarm);
+                }
+            })
+            if(result.length>0){
+            res.send(result);
+            }
+            else{
+                res.status(404).send('No alarm matches the keyword.');
+            }
+        }
       });
 });
 
