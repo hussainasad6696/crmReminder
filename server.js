@@ -230,9 +230,6 @@ app.post('/alarms', (req, res)=>{
                             .then(()=>{
                                 console.log('Notification sent: ');
                                 console.log(alarm);
-                                Histry.create(req.body.alarmModelValues).then((req, res)=>{
-                                    console.log('Added to history.');
-                                });
                                 Alarm.findByIdAndDelete({_id: alarm._id}, req.body).then((his)=>{
                                     console.log("Alarm deleted from current database."+his)
                                 })
@@ -240,6 +237,9 @@ app.post('/alarms', (req, res)=>{
                             .catch((err)=>{
                                 console.log('Error in sending notification:----------------- ', err);
                             });
+                        });
+                        Histry.create(req.body.alarmModelValues).then((req, res)=>{
+                            console.log('Added to history.');
                         });
                     }
                     else
@@ -255,12 +255,83 @@ app.post('/updateAlarm', (req, res)=>{
     console.log(req.body);
     console.log(req.query.id);
     console.log(req.query.deviceUserName);
-    Alarm.findByIdAndUpdate({_id: req.query.id}, req.body).then((alarm)=>{
-        Alarm.findByIdAndUpdate({_id: alarm._id}, {deviceUserName: req.query.deviceUserName}).then((res)=>{
-            
-        console.log('Alarm updated: '+ res);
+    if(req.query.historyCheck === 'false'){
+        Alarm.findByIdAndUpdate({_id: req.query.id}, req.body).then((alarm)=>{
+            Alarm.findByIdAndUpdate({_id: alarm._id}, {deviceUserName: req.query.deviceUserName}).then((res)=>{
+            console.log('Alarm updated: '+ res);
+            })
         })
-    })
+    }
+    else
+    {
+        Histry.findByIdAndDelete({_id: req.query.id}).then(()=>{
+            console.log('Alarm removed from history');
+        })
+        Alarm.create(req.body).then((alarm)=>{
+            console.log(req.query.deviceUserName);
+            Alarm.findByIdAndUpdate({_id: alarm._id}, {deviceUserName: req.query.deviceUserName}).then((ala)=>{
+                console.log('Alarm updated'+ala);
+            })
+            Login.findOneAndUpdate({userName: req.query.deviceUserName}, 
+                {$addToSet: {alarmIDs: JSON.stringify(alarm._id)}}, (err)=>{
+                if(err){
+                    console.log(err+".............................error is here");
+                }
+            }).then((login)=>{
+                const update = {deviceUserName: req.query.deviceUserName, supervisorAdmin: login.supervisorAdmin};
+                Alarm.findByIdAndUpdate({_id: alarm._id}, update).then((result)=>{
+                    console.log(result);
+                })
+                var result = [];
+                console.log("inside the login of alarms..........................................")
+                result = help(alarm.time, alarm.date);
+                min = result[0];
+                hrs = result[1];
+                date = result[2];
+                month = result[3];
+                console.log(min + " " + hrs + " " + date + " " + month);
+                const job = schedule.scheduleJob(`${min || '00'} ${hrs || '00'} ${date || '00'} ${month || '00'} *`, ()=>{
+                    console.log("inside the job schedular or alarm....................................")
+                    var registrationToken = login.deviceTokens;
+                    query = Alarm.findById(alarm._id);          // check if alarm exists in database
+                        if(query)
+                        {
+                            registrationToken.forEach(element=> {
+                                element = element.slice(1);
+                                element = element.slice(0, -1);
+                                console.log(element);
+                                var message = {
+                                    notification: {
+                                        title: alarm.alarmName,
+                                        body: 'Comment: '+alarm.comment 
+                                    },
+                                    token: element
+                                };
+                                console.log("passed message json setter ........................................"+message);
+                                admin.messaging().send(message)
+                                .then(()=>{
+                                    console.log('Notification sent: ');
+                                    console.log(alarm);
+                                    Alarm.findByIdAndDelete({_id: alarm._id}, req.body).then((his)=>{
+                                        console.log("Alarm deleted from current database."+his)
+                                    })
+                                })
+                                .catch((err)=>{
+                                    console.log('Error in sending notification:----------------- ', err);
+                                });
+                            });
+                            Histry.create(req.body.alarmModelValues).then((req, res)=>{
+                                console.log('Added to history.');
+                            });
+                        }
+                        else
+                        {
+                            console.log('Deleted alarm did not send notification.');
+                        }
+                });
+                });
+                });
+    }
 })
 
 app.post('/updatePassword', (req, res)=>{
@@ -630,7 +701,14 @@ app.get('/adminPassword', (req, res)=>{
 });
 
 app.get('/clientList', (req, res)=>{
-    Login.find({supervisorAdmin: req.query.deviceUserName}, '_id userName').then((clients)=>{
-        res.send(clients);
-    })
+    if (req.query.deviceUserName === 'galaxy-developers'){
+        Login.find({}, '_id userName').then((clients)=>{
+            res.send(clients);
+        })
+    }
+    else{
+        Login.find({supervisorAdmin: req.query.deviceUserName}, '_id userName').then((clients)=>{
+            res.send(clients);
+        })
+    }
 });
