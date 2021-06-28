@@ -42988,7 +42988,7 @@ l=p.a
 l.dx=m
 o=t.X
 n=P.a6(["alarmModelValues",l,"deviceUserName",m],o,t._)
-l=P.i4("http","192.168.0.111:50000","/alarms",null)
+l=P.i4("http","182.191.83.152:50000","/alarms",null)
 o=P.a6(["Content-Type","application/json; charset=UTF-8"],o,o)
 q=G.qj(l,C.a9.jU(n,null),o)
 s=1
@@ -43003,7 +43003,7 @@ return P.z(new U.cK().ff(),$async$z5)
 case 3:o=d
 n=p.a
 m=t.X
-l=P.i4("http","192.168.0.111:50000",a,P.a6(["id",n.cy,"deviceUserName",o,"historyCheck",H.c(b)],m,m))
+l=P.i4("http","182.191.83.152:50000",a,P.a6(["id",n.cy,"deviceUserName",o,"historyCheck",H.c(b)],m,m))
 m=P.a6(["Content-Type","application/json; charset=UTF-8"],m,m)
 q=G.qj(l,C.a9.jU(n,null),m)
 s=1
@@ -43020,7 +43020,7 @@ k="deviceUserName"
 s=3
 return P.z(new U.cK().ff(),$async$ll)
 case 3:o=m.a6(["id",l,k,d],p,p)
-n=P.i4("http","192.168.0.111:50000",b,null)
+n=P.i4("http","182.191.83.152:50000",b,null)
 p=P.a6(["Content-Type","application/json; charset=UTF-8"],p,p)
 q=G.qj(n,C.a9.jU(o,null),p)
 s=1
@@ -43032,7 +43032,7 @@ var $async$yj=P.D(function(a,b){if(a===1)return P.E(b,r)
 while(true)switch(s){case 0:s=3
 return P.z(new U.cK().ff(),$async$yj)
 case 3:p=b
-o=P.i4("http","192.168.0.111:50000","/logout",null)
+o=P.i4("http","182.191.83.152:50000","/logout",null)
 n=t.X
 m=P.a6(["Content-Type","application/json; charset=UTF-8"],n,n)
 q=G.qj(o,C.a9.jU(P.a6(["userId",p],n,n),null),m)
@@ -43042,7 +43042,7 @@ case 1:return P.F(q,r)}})
 return P.G($async$yj,r)},
 wV:function(){var s=0,r=P.H(t.Ni),q,p=this,o,n
 var $async$wV=P.D(function(a,b){if(a===1)return P.E(b,r)
-while(true)switch(s){case 0:o=P.i4("http","192.168.0.111:50000","/authentication",null)
+while(true)switch(s){case 0:o=P.i4("http","182.191.83.152:50000","/authentication",null)
 n=t.X
 n=P.a6(["Content-Type","application/json; charset=UTF-8"],n,n)
 s=3
@@ -43057,7 +43057,7 @@ var $async$wN=P.D(function(a,b){if(a===1)return P.E(b,r)
 while(true)switch(s){case 0:l=p.b
 k=l.e
 P.aL(H.c(k)+"  logindetail in addnew auth is")
-o=P.i4("http","192.168.0.111:50000","/addUser",null)
+o=P.i4("http","182.191.83.152:50000","/addUser",null)
 n=t.X
 m=P.a6(["Content-Type","application/json; charset=UTF-8"],n,n)
 s=3
@@ -43074,7 +43074,7 @@ while(true)switch(s){case 0:s=3
 return P.z(new U.cK().ff(),$async$mS)
 case 3:m=c
 P.aL("+++++++++++++token : "+H.c(a)+"+++++++id+++++++++"+H.c(m))
-p=P.i4("http","192.168.0.111:50000","/deviceToken",null)
+p=P.i4("http","182.191.83.152:50000","/deviceToken",null)
 o=t.X
 n=P.a6(["Content-Type","application/json; charset=UTF-8"],o,o)
 q=G.qj(p,C.a9.jU(P.a6(["deviceToken",a,"id",m],o,o),null),n)
@@ -43088,7 +43088,7 @@ uo:function(){var s=0,r=P.H(t.Hk),q,p=2,o,n=[],m=this,l,k,j,i,h
 var $async$uo=P.D(function(a,b){if(a===1){o=b
 s=p}while(true)switch(s){case 0:p=4
 s=7
-return P.z(G.VO(P.i4("http","192.168.0.111:50000","/admin",null)),$async$uo)
+return P.z(G.VO(P.i4("http","182.191.83.152:50000","/admin",null)),$async$uo)
 case 7:l=b
 if(l.b===200){j=l
 P.aL(B.kj(U.kg(j.e).c.a.h(0,"charset")).cu(0,j.x)+" getLsadkasldkjasdk")
@@ -43120,7 +43120,7 @@ s=p}while(true)switch(s){case 0:p=4
 h=t.z
 l=P.a6(["userName",m.b.a],h,h)
 s=7
-return P.z(G.VO(P.i4("http","192.168.0.111:50000","/authentication",l)),$async$uE)
+return P.z(G.VO(P.i4("http","182.191.83.152:50000","/authentication",l)),$async$uE)
 case 7:k=b
 if(k.b===200){h=k
 j=C.a9.oW(0,B.kj(U.kg(h.e).c.a.h(0,"charset")).cu(0,h.x),null)
@@ -43148,7 +43148,7 @@ ub:function(a,b){return this.ams(a,b)},
 ams:function(a,b){var s=0,r=P.H(t.Ni),q,p,o
 var $async$ub=P.D(function(c,d){if(c===1)return P.E(d,r)
 while(true)switch(s){case 0:P.aL("i am here in updateLoginDetail")
-p=P.i4("http","192.168.0.111:50000",a,null)
+p=P.i4("http","182.191.83.152:50000",a,null)
 o=t.X
 o=P.a6(["Content-Type","application/json; charset=UTF-8"],o,o)
 s=3
@@ -43165,7 +43165,7 @@ var $async$q7=P.D(function(b,c){if(b===1)return P.E(c,r)
 while(true)switch(s){case 0:o=t.X
 m=G
 l=P
-k="192.168.0.111:50000"
+k="182.191.83.152:50000"
 j="/clientList"
 i=P
 h="deviceUserName"
@@ -43188,7 +43188,7 @@ s=p}while(true)switch(s){case 0:p=4
 i=t.X
 l=P.a6(["deviceUserName",b,"searchKeyWord",c],i,i)
 s=7
-return P.z(G.VO(P.i4("http","192.168.0.111:50000",a,l)),$async$uz)
+return P.z(G.VO(P.i4("http","182.191.83.152:50000",a,l)),$async$uz)
 case 7:k=e
 i=k
 P.aL("====getAllTheAlarm======"+B.kj(U.kg(i.e).c.a.h(0,"charset")).cu(0,i.x)+"======")
@@ -43226,7 +43226,7 @@ p=5
 i=t.X
 l=P.a6(["deviceUserName",g,"searchKeyWord",b],i,i)
 s=8
-return P.z(G.VO(P.i4("http","192.168.0.111:50000",a,l)),$async$hg)
+return P.z(G.VO(P.i4("http","182.191.83.152:50000",a,l)),$async$hg)
 case 8:k=d
 i=k
 P.aL("====getAllTheAlarm======"+B.kj(U.kg(i.e).c.a.h(0,"charset")).cu(0,i.x)+"======")
